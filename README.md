@@ -1,10 +1,9 @@
 ### Midi Server
 
-It's a socket.io server that sends midi notes. And it's a React App that
+It's a socket.io server that sends MIDI notes. And it's a React App that
 visualizes the notes. 
 
-The server takes the midi events from the first MIDI port (not yet configurable)
-and sends them to port 800 (also not yet configurable). 
+The server takes the MIDI events from the first MIDI port and sends them to port 8000.
 
 #### Run it
 `node src/server`

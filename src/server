@@ -1,28 +1,34 @@
-var app = require('http').createServer()
-var io = require('socket.io')(app);
-var midi = require('midi');
+var server = require('http').createServer(),
+    io = require('socket.io')(server),
+    midi = require('midi'),
+    midiInput = new midi.input(),
+    socket = null;
 
-var input = new midi.input();
-input.openPort(0);
-
-app.listen(8000);
-
-io.on('connection', function (socket) {
-  input.on('message', function(delta, message) {
-    console.log(message)
-    socket.emit('note', {
-      delta: delta,
-      status: message[0],
-      note: message[1],
-      velocity: message[2]
-    })
-  })
-});
-
-io.on('disconnect', finish);
-process.on('SIGINT', finish);
-// process.on('uncaughtException', reportError) // TODO
+midiInput.openPort(0);
 
 var finish = function() {
-  input.closePort();
+  midiInput.closePort();
+  server.close();
+  console.log("Midiserver has left the building.");
 }
+
+server.listen(8000);
+
+io.on('connection', function (sio) {
+  console.log("Connected. " + new Date)
+  socket = sio;
+});
+
+midiInput.on('message', function(delta, message) {
+  console.log(message)
+  io.emit('note', {
+    delta: delta,
+    status: message[0],
+    note: message[1],
+    velocity: message[2]
+  })
+})
+
+// io.on('disconnect', finish);
+process.on('SIGINT', finish);
+// process.on('uncaughtException', reportError) // TODO
